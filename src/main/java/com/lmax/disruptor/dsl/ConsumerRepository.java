@@ -28,6 +28,8 @@ class ConsumerRepository<T> implements Iterable<ConsumerInfo>
 {
     private final Map<EventHandler<?>, EventProcessorInfo<T>> eventProcessorInfoByEventHandler =
         new IdentityHashMap<>();
+    private final Map<EventProcessor, EventProcessorInfo<T>> eventProcessorInfoByEventProcessor =
+            new IdentityHashMap<>();
     private final Map<Sequence, ConsumerInfo> eventProcessorInfoBySequence =
         new IdentityHashMap<>();
     private final Collection<ConsumerInfo> consumerInfos = new ArrayList<>();
@@ -46,6 +48,7 @@ class ConsumerRepository<T> implements Iterable<ConsumerInfo>
     public void add(final EventProcessor processor)
     {
         final EventProcessorInfo<T> consumerInfo = new EventProcessorInfo<>(processor, null, null);
+        eventProcessorInfoByEventProcessor.put(processor, consumerInfo);
         eventProcessorInfoBySequence.put(processor.getSequence(), consumerInfo);
         consumerInfos.add(consumerInfo);
     }
@@ -114,6 +117,11 @@ class ConsumerRepository<T> implements Iterable<ConsumerInfo>
     private EventProcessorInfo<T> getEventProcessorInfo(final EventHandler<T> handler)
     {
         return eventProcessorInfoByEventHandler.get(handler);
+    }
+
+    private EventProcessorInfo<T> getEventProcessorInfo(final EventProcessor processor)
+    {
+        return eventProcessorInfoByEventProcessor.get(processor);
     }
 
     private ConsumerInfo getEventProcessorInfo(final Sequence barrierEventProcessor)
